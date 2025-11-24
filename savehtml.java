@@ -9,10 +9,15 @@
 
   const all = JSON.parse(raw);
 
-  // 헤더 포함 (순서: text, rating, empathy)
-  const rows = [['text', 'rating', 'empathy']];
+  // ★ 헤더를 한글로 변경 (순서: 리뷰내용, 평점, 공감)
+  const rows = [['리뷰내용', '평점', '공감']];
+
   all.forEach(r => {
-    rows.push([r.text || '', r.rating || '', r.empathy || '']);
+    rows.push([
+      r.text || '',      // 리뷰 내용
+      r.rating || '',    // 평점
+      r.empathy || ''    // 공감 수
+    ]);
   });
 
   function toCsvRow(fields) {
@@ -41,7 +46,7 @@
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 
-  // ★ CSV 다운로드 후 localStorage에서 데이터 삭제
+  // 다운로드 후 localStorage 비우기
   localStorage.removeItem(STORAGE_KEY);
 
   console.log(`총 ${all.length}개의 리뷰를 interpark_reviews_merged.csv 로 저장했고, localStorage에서 데이터는 삭제했습니다.`);
