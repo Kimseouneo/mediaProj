@@ -41,5 +41,8 @@
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 
-  console.log(`총 ${all.length}개의 리뷰를 interpark_reviews_merged.csv 로 저장했습니다.`);
+  // ★ CSV 다운로드 후 localStorage에서 데이터 삭제
+  localStorage.removeItem(STORAGE_KEY);
+
+  console.log(`총 ${all.length}개의 리뷰를 interpark_reviews_merged.csv 로 저장했고, localStorage에서 데이터는 삭제했습니다.`);
 })();
