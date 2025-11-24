@@ -1,2 +1,0 @@
-# mediaProj
-미프
