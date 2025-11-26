@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문화 수준 진단</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: white;
+            color: black;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .progress-container {
+            margin-bottom: 32px;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 2px;
+            background-color: #e5e5e5;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: black;
+            transition: width 0.3s;
+        }
+
+        .artwork-info {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .artwork-title {
+            font-size: 32px;
+            font-weight: normal;
+            margin-bottom: 16px;
+        }
+
+        .artwork-creator {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .artwork-year {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            border: 1px solid black;
+            background: white;
+            color: black;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: black;
+            color: white;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-title {
+            font-size: 32px;
+            font-weight: normal;
+            margin-bottom: 32px;
+        }
+
+        .result-level {
+            font-size: 24px;
+            font-weight: normal;
+            margin-bottom: 16px;
+        }
+
+        .result-score {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 48px;
+        }
+
+        .result-categories {
+            margin-bottom: 48px;
+        }
+
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .category-name {
+            color: black;
+        }
+
+        .category-score {
+            color: #666;
+        }
+
+        .result-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-screen {
+            text-align: center;
+        }
+
+        .input-title {
+            font-size: 32px;
+            font-weight: normal;
+            margin-bottom: 48px;
+        }
+
+        .input-form {
+            margin-bottom: 32px;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid black;
+            background: white;
+            color: black;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            background: #f5f5f5;
+        }
+
+        .privacy-notice {
+            font-size: 12px;
+            color: #999;
+            margin-top: 24px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 입력 화면 -->
+        <div id="input-screen" class="input-screen">
+            <h1 class="input-title">문화 수준 진단</h1>
+            <div class="input-form">
+                <div class="input-group">
+                    <label for="user-name">이름</label>
+                    <input type="text" id="user-name" placeholder="이름을 입력하세요" onkeypress="handleInputEnter(event)">
+                </div>
+                <div class="input-group">
+                    <label for="user-email">이메일</label>
+                    <input type="email" id="user-email" placeholder="이메일을 입력하세요" onkeypress="handleInputEnter(event)">
+                </div>
+            </div>
+            <div class="privacy-notice">
+                위 정보는 문화수준측정을 위한 정보로만 사용됩니다
+            </div>
+            <button onclick="startTest()">시작하기</button>
+        </div>
+
+        <!-- 메인 화면 -->
+        <div id="main-screen" style="display: none;">
+            <div class="progress-container">
+                <div class="progress-text" id="progress-text"></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+
+            <div class="artwork-info">
+                <h1 class="artwork-title" id="artwork-title"></h1>
+                <div class="artwork-creator" id="artwork-creator"></div>
+                <div class="artwork-year" id="artwork-year"></div>
+            </div>
+
+            <div class="buttons">
+                <button id="know-btn" onclick="handleKnow()">안다</button>
+                <button id="dont-know-btn" onclick="handleDontKnow()">모른다</button>
+            </div>
+        </div>
+
+        <!-- 결과 화면 -->
+        <div id="result-screen" style="display: none;">
+            <div class="result-container">
+                <h1 class="result-title">문화 수준 진단 결과</h1>
+
+                <div>
+                    <div class="result-level" id="result-level"></div>
+                    <div class="result-score" id="result-score"></div>
+                </div>
+
+                <div class="result-categories" id="result-categories"></div>
+
+                <div class="result-buttons">
+                    <button onclick="restart()">다시 시작하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 작품 데이터
+        const ART_PIECES = [
+            { id: 'art_monalisa', title: '모나리자', creator: '레오나르도 다 빈치', year: '1503-1519' },
+            { id: 'art_starrynight', title: '별이 빛나는 밤', creator: '빈센트 반 고흐', year: '1889' },
+            { id: 'art_scream', title: '절규', creator: '에드바르 뭉크', year: '1893' },
+            { id: 'art_guernica', title: '게르니카', creator: '파블로 피카소', year: '1937' },
+            { id: 'art_soupcans', title: '캠벨 수프 캔', creator: '앤디 워홀', year: '1962' },
+            { id: 'art_greatwave', title: '가나가와의 거대한 파도', creator: '가쓰시카 호쿠사이', year: '1831' },
+            { id: 'art_memory', title: '기억의 지속', creator: '살바도르 달리', year: '1931' },
+            { id: 'art_kiss', title: '키스', creator: '구스타프 클림트', year: '1907-1908' },
+            { id: 'art_balloon', title: '소녀와 풍선', creator: '뱅크시', year: '2002' },
+            { id: 'art_infinity', title: '인피니티 미러룸', creator: '쿠사마 야요이', year: '1965' },
+            { id: 'art_beauty', title: '미인도', creator: '신윤복', year: '1805' },
+            { id: 'art_tvbuddha', title: 'TV 부처', creator: '백남준', year: '1974' },
+            { id: 'art_nighthawks', title: '밤의 매', creator: '에드워드 호퍼', year: '1942' },
+            { id: 'art_waterlilies', title: '수련', creator: '클로드 모네', year: '1919' },
+            { id: 'art_persistence', title: '지속되는 기억', creator: '살바도르 달리', year: '1931' },
+        ];
+
+        const MUSICALS = [
+            { id: 'mus_lesmis', title: '레 미제라블', creator: '클로드-미셸 숀버그', year: '1980' },
+            { id: 'mus_phantom', title: '오페라의 유령', creator: '앤드루 로이드 웨버', year: '1986' },
+            { id: 'mus_cats', title: '캣츠', creator: '앤드루 로이드 웨버', year: '1981' },
+            { id: 'mus_lionking', title: '라이온 킹', creator: '엘튼 존·팀 라이스', year: '1997' },
+            { id: 'mus_mammamia', title: '맘마 미아!', creator: 'ABBA 음악 기반', year: '1999' },
+            { id: 'mus_wicked', title: '위키드', creator: '스티븐 슈워츠', year: '2003' },
+            { id: 'mus_missaigon', title: '미스 사이공', creator: '숀버그·부벨', year: '1989' },
+            { id: 'mus_jekyll', title: '지킬 앤 하이드', creator: '프랭크 와일드혼', year: '1997' },
+            { id: 'mus_hamilton', title: '해밀턴', creator: '린-마누엘 미란다', year: '2015' },
+            { id: 'mus_werther', title: '베르테르', creator: '한국 창작', year: '2010' },
+            { id: 'mus_smileman', title: '웃는 남자', creator: '프랭크 와일드혼', year: '2012' },
+            { id: 'mus_redbook', title: '레드북', creator: '한국 창작', year: '2018' },
+            { id: 'mus_rent', title: '렌트', creator: '조나단 라슨', year: '1996' },
+            { id: 'mus_spring', title: '춘향전', creator: '한국 창작', year: '2015' },
+            { id: 'mus_elizabeth', title: '엘리자베스', creator: '실베스터 르베이', year: '1992' },
+        ];
+
+        const PLAYS = [
+            { id: 'play_hamlet', title: '햄릿', creator: '윌리엄 셰익스피어', year: '1603' },
+            { id: 'play_romeo', title: '로미오와 줄리엣', creator: '윌리엄 셰익스피어', year: '1597' },
+            { id: 'play_macbeth', title: '맥베스', creator: '윌리엄 셰익스피어', year: '1606' },
+            { id: 'play_antigone', title: '안티고네', creator: '소포클레스', year: 'BC 441' },
+            { id: 'play_oedipus', title: '오이디푸스 왕', creator: '소포클레스', year: 'BC 429' },
+            { id: 'play_streetcar', title: '욕망이라는 이름의 전차', creator: '테네시 윌리엄스', year: '1947' },
+            { id: 'play_salesman', title: '세일즈맨의 죽음', creator: '아서 밀러', year: '1949' },
+            { id: 'play_cherry', title: '벚꽃 동산', creator: '안톤 체호프', year: '1904' },
+            { id: 'play_godot', title: '고도를 기다리며', creator: '사무엘 베케트', year: '1953' },
+            { id: 'play_noexit', title: '출구 없는 방', creator: '장 폴 사르트르', year: '1944' },
+            { id: 'play_bald', title: '대머리 여가수', creator: '외젠 이오네스코', year: '1950' },
+            { id: 'play_guard', title: '파수꾼', creator: '이강백', year: '1968' },
+            { id: 'play_come', title: '날 보러와요', creator: '김광림 각색', year: '1990' },
+            { id: 'play_liar', title: '라이어', creator: '레이 쿠니', year: '1989' },
+            { id: 'play_glass', title: '유리 동물원', creator: '테네시 윌리엄스', year: '1944' },
+            { id: 'play_waiting', title: '고도를 기다리며', creator: '사무엘 베케트', year: '1953' },
+            { id: 'play_rhinoceros', title: '코뿔소', creator: '외젠 이오네스코', year: '1959' },
+            { id: 'play_king', title: '리어왕', creator: '윌리엄 셰익스피어', year: '1606' },
+        ];
+
+        const CATEGORIES = [
+            { key: 'art', label: '예술 작품', items: ART_PIECES },
+            { key: 'musical', label: '뮤지컬', items: MUSICALS },
+            { key: 'play', label: '연극', items: PLAYS },
+        ];
+
+        // 상태
+        let userName = '';
+        let userEmail = '';
+        let currentStep = 0;
+        let currentArtworkIndex = 0;
+        const selectedItems = {};
+        const totalItems = CATEGORIES.reduce((sum, cat) => sum + cat.items.length, 0);
+
+        // 엔터 키 처리
+        function handleInputEnter(event) {
+            if (event.key === 'Enter') {
+                startTest();
+            }
+        }
+
+        // 테스트 시작
+        function startTest() {
+            const nameInput = document.getElementById('user-name');
+            const emailInput = document.getElementById('user-email');
+
+            userName = nameInput.value.trim();
+            userEmail = emailInput.value.trim();
+
+            if (!userName) {
+                alert('이름을 입력해주세요.');
+                nameInput.focus();
+                return;
+            }
+
+            // 한글 이름이 1글자인 경우 검증
+            const koreanRegex = /^[가-힣]+$/;
+            if (koreanRegex.test(userName) && userName.length === 1) {
+                alert('한글 이름은 2글자 이상 입력해주세요.');
+                nameInput.focus();
+                return;
+            }
+
+            if (!userEmail) {
+                alert('이메일을 입력해주세요.');
+                emailInput.focus();
+                return;
+            }
+
+            // 이메일 형식 검증
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(userEmail)) {
+                alert('올바른 이메일 형식을 입력해주세요.');
+                emailInput.focus();
+                return;
+            }
+
+            document.getElementById('input-screen').style.display = 'none';
+            document.getElementById('main-screen').style.display = 'block';
+            updateScreen();
+        }
+
+        // 현재 작품 가져오기
+        function getCurrentArtwork() {
+            return CATEGORIES[currentStep].items[currentArtworkIndex];
+        }
+
+        // 진행률 계산
+        function getProgress() {
+            const currentIndex = CATEGORIES.slice(0, currentStep).reduce((sum, cat) => sum + cat.items.length, 0) + currentArtworkIndex + 1;
+            return (currentIndex / totalItems) * 100;
+        }
+
+        // 화면 업데이트
+        function updateScreen() {
+            const artwork = getCurrentArtwork();
+            const category = CATEGORIES[currentStep];
+
+            // 진행 표시
+            document.getElementById('progress-text').textContent = 
+                `${category.label} (${currentArtworkIndex + 1}/${category.items.length})`;
+            document.getElementById('progress-fill').style.width = `${getProgress()}%`;
+
+            // 작품 정보
+            document.getElementById('artwork-title').textContent = artwork.title;
+            document.getElementById('artwork-creator').textContent = artwork.creator;
+            document.getElementById('artwork-year').textContent = artwork.year || '';
+        }
+
+        // 다음으로 이동
+        function goToNext() {
+            const category = CATEGORIES[currentStep];
+            const isLastArtwork = currentArtworkIndex === category.items.length - 1;
+            const isLastCategory = currentStep === CATEGORIES.length - 1;
+
+            if (!isLastArtwork) {
+                currentArtworkIndex++;
+                updateScreen();
+            } else if (!isLastCategory) {
+                currentStep++;
+                currentArtworkIndex = 0;
+                updateScreen();
+            } else {
+                showResult();
+            }
+        }
+
+        // 안다 버튼
+        function handleKnow() {
+            const artwork = getCurrentArtwork();
+            selectedItems[artwork.id] = true;
+            goToNext();
+        }
+
+        // 모른다 버튼
+        function handleDontKnow() {
+            const artwork = getCurrentArtwork();
+            selectedItems[artwork.id] = false;
+            goToNext();
+        }
+
+        // 결과 계산
+        function calculateResults() {
+            const categoryResults = {};
+            let totalKnown = 0;
+            const detailedResults = [];
+
+            CATEGORIES.forEach(category => {
+                const known = category.items.filter(item => selectedItems[item.id]).length;
+                const total = category.items.length;
+                categoryResults[category.key] = { known, total };
+                totalKnown += known;
+
+                // 상세 결과 수집
+                category.items.forEach(item => {
+                    detailedResults.push({
+                        category: category.label,
+                        title: item.title,
+                        creator: item.creator,
+                        year: item.year || '',
+                        known: selectedItems[item.id] ? '안다' : '모른다'
+                    });
+                });
+            });
+
+            // 수준 판정
+            const ratio = totalKnown / totalItems;
+            let level = '초급자';
+            if (ratio >= 0.7) {
+                level = '고급자';
+            } else if (ratio >= 0.4) {
+                level = '중급자';
+            }
+
+            return { level, totalKnown, totalItems, categoryResults, detailedResults };
+        }
+
+        // 전역 결과 변수
+        let currentResults = null;
+
+        // 결과 화면 표시
+        function showResult() {
+            currentResults = calculateResults();
+
+            document.getElementById('main-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+
+            document.getElementById('result-level').textContent = currentResults.level;
+            document.getElementById('result-score').textContent = 
+                `${currentResults.totalKnown} / ${currentResults.totalItems}`;
+
+            const categoriesDiv = document.getElementById('result-categories');
+            categoriesDiv.innerHTML = '';
+
+            Object.entries(currentResults.categoryResults).forEach(([category, stats]) => {
+                const categoryName = category === 'art' ? '예술 작품' : 
+                                    category === 'musical' ? '뮤지컬' : '연극';
+                
+                const div = document.createElement('div');
+                div.className = 'category-item';
+                div.innerHTML = `
+                    <span class="category-name">${categoryName}</span>
+                    <span class="category-score">${stats.known}/${stats.total}</span>
+                `;
+                categoriesDiv.appendChild(div);
+            });
+
+            // 자동 저장
+            downloadJSON();
+        }
+
+        // 파일명 안전하게 만들기
+        function sanitizeFileName(name) {
+            return name.replace(/[<>:"/\\|?*]/g, '_');
+        }
+
+        // JSON 파일 다운로드
+        function downloadJSON() {
+            if (!currentResults) return;
+
+            const jsonData = {
+                user: {
+                    name: userName,
+                    email: userEmail
+                },
+                timestamp: new Date().toISOString(),
+                level: currentResults.level,
+                totalKnown: currentResults.totalKnown,
+                totalItems: currentResults.totalItems,
+                ratio: Math.round((currentResults.totalKnown / currentResults.totalItems) * 100),
+                categoryResults: currentResults.categoryResults,
+                detailedResults: currentResults.detailedResults
+            };
+
+            const jsonContent = JSON.stringify(jsonData, null, 2);
+            const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            const safeFileName = sanitizeFileName(userName);
+            link.href = url;
+            link.download = `문화수준진단_${safeFileName}_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 다시 시작
+        function restart() {
+            currentStep = 0;
+            currentArtworkIndex = 0;
+            currentResults = null;
+            Object.keys(selectedItems).forEach(key => delete selectedItems[key]);
+
+            document.getElementById('input-screen').style.display = 'block';
+            document.getElementById('main-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'none';
+            
+            // 입력 필드 초기화
+            document.getElementById('user-name').value = '';
+            document.getElementById('user-email').value = '';
+            userName = '';
+            userEmail = '';
+        }
+    </script>
+</body>
+</html>
+
