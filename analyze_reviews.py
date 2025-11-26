@@ -87,9 +87,16 @@ def analyze_review_for_beginners(csv_file_path):
     if len(likes_weights) != len(reviews):
         # 불일치 시 모든 가중치를 1로 초기화
         likes_weights = [1.0] * len(reviews)
+
+    has_ratings = len(ratings) > 0
+
+    if not has_ratings:
+        # 평점 데이터가 없으면 모든 리뷰를 동일 가중치로 취급
+        likes_weights = [1.0] * len(reviews)
+
     # 평점도 리뷰 길이에 맞춰 가중치가 존재하도록 최소 길이로 자름
     min_len_for_ratings = min(len(ratings), len(likes_weights)) if ratings else 0
-    if ratings and min_len_for_ratings > 0:
+    if has_ratings and min_len_for_ratings > 0:
         weights_for_ratings = likes_weights[:min_len_for_ratings]
         ratings_trimmed = ratings[:min_len_for_ratings]
         weight_sum = sum(weights_for_ratings) or 1.0
@@ -98,7 +105,7 @@ def analyze_review_for_beginners(csv_file_path):
         positive_ratio = (positive_weight / weight_sum) if weight_sum > 0 else 0
     else:
         avg_rating = None
-        positive_ratio = 0
+        positive_ratio = None
     
     # 리뷰 내용 분석 (초급자 관련 키워드)
     beginner_keywords_positive = [
@@ -109,7 +116,9 @@ def analyze_review_for_beginners(csv_file_path):
     
     beginner_keywords_negative = [
         '어렵', '난이도', '복잡', '전문', '고급', '중급', '어려움',
-        'difficult', 'hard', 'complex', 'advanced', 'expert'
+        'difficult', 'hard', 'complex', 'advanced', 'expert',
+        '별로', '좁다', '조심', '너무 많다', '이해가 안된다', '그지', '그지같다',
+        '감당 가능', '아쉬워요', '아쉽다', '끊긴다', '끊어버리는', '끊기는', '아쉬운'
     ]
     
     positive_count = 0.0
@@ -153,7 +162,7 @@ def analyze_review_for_beginners(csv_file_path):
                     '고등', '고등생', '고등학생', '고1', '고2', '고3'
                 ],
                 '성인': [
-                    '성인', '어른', '대학생', '직장인'
+                    '성인', '어른', '대학생', '직장인', '부모님', '친구들', '동료', '동료들', '대학'
                 ],
             }
             age_counts = {k: 0 for k in age_groups.keys()}
@@ -229,14 +238,27 @@ def analyze_review_for_beginners(csv_file_path):
             scores.append(0.2)
     
     # 긍정 리뷰 비율 (공감 가중 비율 사용)
-    if positive_ratio >= 0.8:
-        scores.append(1.0)
-    elif positive_ratio >= 0.6:
-        scores.append(0.7)
-    elif positive_ratio >= 0.4:
-        scores.append(0.5)
+    if positive_ratio is not None:
+        if positive_ratio >= 0.8:
+            scores.append(1.0)
+        elif positive_ratio >= 0.6:
+            scores.append(0.7)
+        elif positive_ratio >= 0.4:
+            scores.append(0.5)
+        else:
+            scores.append(0.3)
     else:
-        scores.append(0.3)
+        # 평점이 없는 경우 키워드 감성 비율을 0~1 구간으로 변환하여 활용
+        derived_ratio = (keyword_sentiment_ratio + 1.0) / 2.0
+        derived_ratio = max(0.0, min(1.0, derived_ratio))
+        if derived_ratio >= 0.8:
+            scores.append(0.9)
+        elif derived_ratio >= 0.6:
+            scores.append(0.7)
+        elif derived_ratio >= 0.4:
+            scores.append(0.5)
+        else:
+            scores.append(0.35)
     
     # 키워드 감성 분석
     if keyword_sentiment_ratio > 0.3:
@@ -280,7 +302,7 @@ def analyze_review_for_beginners(csv_file_path):
         'avg_rating': round(avg_rating, 2) if avg_rating else None,
         'total_reviews': len(reviews),
         'total_ratings': len(ratings),
-        'positive_ratio': round(positive_ratio * 100, 1),
+        'positive_ratio': round(positive_ratio * 100, 1) if positive_ratio is not None else None,
         'keyword_analysis': {
             'positive_keywords_found': round(positive_count, 1),
             'negative_keywords_found': round(negative_count, 1),
@@ -311,10 +333,11 @@ def generate_reason(suitable, avg_rating, positive_ratio, keyword_sentiment_rati
         elif avg_rating < 3.0:
             reasons.append(f"평균 평점이 {avg_rating:.2f}점으로 낮습니다.")
     
-    if positive_ratio >= 0.8:
-        reasons.append(f"리뷰의 {positive_ratio*100:.1f}%가 4점 이상입니다.")
-    elif positive_ratio < 0.4:
-        reasons.append(f"리뷰의 {positive_ratio*100:.1f}%만 4점 이상입니다.")
+    if positive_ratio is not None:
+        if positive_ratio >= 0.8:
+            reasons.append(f"리뷰의 {positive_ratio*100:.1f}%가 4점 이상입니다.")
+        elif positive_ratio < 0.4:
+            reasons.append(f"리뷰의 {positive_ratio*100:.1f}%만 4점 이상입니다.")
     
     if keyword_sentiment_ratio > 0.3:
         reasons.append("입문자에게 적합하다는 긍정적인 언급이 많습니다.")
@@ -558,6 +581,7 @@ def generate_html(results_list):
             age_group = result.get('age_recommendation', {}).get('recommended_group', '성인')
             age_counts = result.get('age_recommendation', {}).get('counts', {})
             empathy = result.get('empathy', {})
+            positive_ratio_display = f"{result['positive_ratio']}%" if result['positive_ratio'] is not None else "데이터 없음"
             
             html += f"""
         <div class="work-card">
@@ -600,7 +624,7 @@ def generate_html(results_list):
                 
                 <div class="stat-item">
                     <div class="stat-label">긍정 리뷰 비율</div>
-                    <div class="stat-value">{result['positive_ratio']}%</div>
+                    <div class="stat-value">{positive_ratio_display}</div>
                 </div>
                 
                 <div class="stat-item">
