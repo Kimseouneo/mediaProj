@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -17,14 +18,38 @@
             color: black;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        .top-progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 4px;
+            background-color: #e8f5e9;
+            z-index: 1000;
+        }
+
+        .top-progress-fill {
+            height: 100%;
+            background-color: #4caf50;
+            transition: width 0.3s ease;
+            width: 0%;
         }
 
         .container {
             max-width: 600px;
             width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .progress-container {
@@ -40,12 +65,12 @@
         .progress-bar {
             width: 100%;
             height: 2px;
-            background-color: #e5e5e5;
+            background-color: #e8f5e9;
         }
 
         .progress-fill {
             height: 100%;
-            background-color: black;
+            background-color: #4caf50;
             transition: width 0.3s;
         }
 
@@ -81,15 +106,15 @@
             width: 100%;
             padding: 16px;
             font-size: 18px;
-            border: 1px solid black;
+            border: 1px solid #4caf50;
             background: white;
-            color: black;
+            color: #2e7d32;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         button:hover {
-            background: black;
+            background: #4caf50;
             color: white;
         }
 
@@ -107,12 +132,37 @@
             font-size: 24px;
             font-weight: normal;
             margin-bottom: 16px;
+            color: #2e7d32;
         }
 
         .result-score {
             font-size: 18px;
-            color: #666;
+            color: #4caf50;
             margin-bottom: 48px;
+        }
+
+        .category-level-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .level-beginner {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .level-intermediate {
+            background-color: #a5d6a7;
+            color: #1b5e20;
+        }
+
+        .level-advanced {
+            background-color: #81c784;
+            color: #1b5e20;
         }
 
         .result-categories {
@@ -122,16 +172,65 @@
         .category-item {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #ccc;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+            background-color: #f1f8f4;
         }
 
         .category-name {
-            color: black;
+            color: #2e7d32;
+            font-weight: 500;
         }
 
         .category-score {
-            color: #666;
+            color: #4caf50;
+            font-weight: 500;
+        }
+
+        .category-level {
+            font-size: 14px;
+            color: #66bb6a;
+            margin-top: 4px;
+        }
+
+        .overall-assessment {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border: 2px solid #4caf50;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .overall-title {
+            font-size: 18px;
+            color: #2e7d32;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .overall-level {
+            font-size: 36px;
+            font-weight: bold;
+            color: #1b5e20;
+            margin-bottom: 12px;
+        }
+
+        .overall-description {
+            font-size: 14px;
+            color: #4caf50;
+            line-height: 1.6;
+        }
+
+        .overall-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 12px;
         }
 
         .result-buttons {
@@ -170,14 +269,15 @@
             width: 100%;
             padding: 12px;
             font-size: 16px;
-            border: 1px solid black;
+            border: 1px solid #4caf50;
             background: white;
-            color: black;
+            color: #2e7d32;
         }
 
         .input-group input:focus {
             outline: none;
-            background: #f5f5f5;
+            border-color: #66bb6a;
+            background: #f1f8f4;
         }
 
         .privacy-notice {
@@ -186,9 +286,48 @@
             margin-top: 24px;
             text-align: center;
         }
+
+        .language-toggle {
+            position: fixed;
+            top: 8px;
+            right: 8px;
+            z-index: 1001;
+            width: 10vw;
+            max-width: 100px;
+            min-width: 60px;
+            background: white;
+            border: 1px solid #4caf50;
+            border-radius: 16px;
+            padding: 4px 8px;
+            font-size: 11px;
+            color: #2e7d32;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .language-toggle:hover {
+            background: #4caf50;
+            color: white;
+            box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+        }
+
     </style>
 </head>
 <body>
+    <!-- 언어 토글 버튼 -->
+    <button class="language-toggle" id="language-toggle" onclick="toggleLanguage()">English</button>
+
+    <!-- 상단 고정 진행률 바 -->
+    <div class="top-progress-bar">
+        <div class="top-progress-fill" id="top-progress-fill"></div>
+    </div>
+
     <div class="container">
         <!-- 입력 화면 -->
         <div id="input-screen" class="input-screen">
@@ -225,6 +364,7 @@
             </div>
 
             <div class="buttons">
+                <button id="seen-btn" onclick="handleSeen()">실제로 경험해본 적이 있다</button>
                 <button id="know-btn" onclick="handleKnow()">안다</button>
                 <button id="dont-know-btn" onclick="handleDontKnow()">모른다</button>
             </div>
@@ -233,8 +373,6 @@
         <!-- 결과 화면 -->
         <div id="result-screen" style="display: none;">
             <div class="result-container">
-                <h1 class="result-title">문화 수준 진단 결과</h1>
-
                 <div>
                     <div class="result-level" id="result-level"></div>
                     <div class="result-score" id="result-score"></div>
@@ -250,68 +388,124 @@
     </div>
 
     <script>
-        // 작품 데이터
+        // 언어 설정
+        let currentLanguage = 'ko'; // 'ko' or 'en'
+
+        // 번역 데이터
+        const translations = {
+            ko: {
+                title: '문화 수준 진단',
+                name: '이름',
+                email: '이메일',
+                namePlaceholder: '이름을 입력하세요',
+                emailPlaceholder: '이메일을 입력하세요',
+                privacy: '위 정보는 문화수준측정을 위한 정보로만 사용됩니다',
+                start: '시작하기',
+                know: '안다',
+                seen: '실제로 경험해본 적이 있다',
+                dontKnow: '모른다',
+                overallTitle: '전반적인 문화 수준',
+                overallBeginner: '입문자',
+                overallIntermediate: '중급자',
+                overallAdvanced: '고급자',
+                overallDescBeginner: '문화 작품에 대한 관심을 갖기 시작한 단계입니다. 앞으로 더 많은 작품을 만나보세요!',
+                overallDescIntermediate: '기본적인 문화 작품들을 알고 있으며, 더 많은 작품을 탐구할 여지가 있습니다.',
+                overallDescAdvanced: '다양한 분야의 문화 작품에 대한 폭넓은 지식을 갖추고 있습니다. 문화 수준이 매우 높습니다!',
+                knownCount: '개 알고 있음',
+                categoryResult: '분야별 문화 수준 진단 결과',
+                total: '전체',
+                resultTitle: '문화 수준 진단 결과',
+                restart: '다시 시작하기',
+                art: '예술 작품',
+                musical: '뮤지컬',
+                play: '연극',
+                beginner: '입문',
+                intermediate: '중급',
+                advanced: '고급',
+                alertName: '이름을 입력해주세요.',
+                alertNameLength: '한글 이름은 2글자 이상 입력해주세요.',
+                alertEmail: '이메일을 입력해주세요.',
+                alertEmailFormat: '올바른 이메일 형식을 입력해주세요.'
+            },
+            en: {
+                title: 'Culture Level Assessment',
+                name: 'Name',
+                email: 'Email',
+                namePlaceholder: 'Enter your name',
+                emailPlaceholder: 'Enter your email',
+                privacy: 'This information is used only for culture level measurement',
+                start: 'Start',
+                know: 'Know',
+                seen: 'Have Actually Experienced',
+                dontKnow: "Don't Know",
+                overallTitle: 'Overall Culture Level',
+                overallBeginner: 'Beginner',
+                overallIntermediate: 'Intermediate',
+                overallAdvanced: 'Advanced',
+                overallDescBeginner: 'You are starting to develop an interest in cultural works. Explore more works in the future!',
+                overallDescIntermediate: 'You know basic cultural works and have room to explore more works.',
+                overallDescAdvanced: 'You have extensive knowledge of cultural works across various fields. Your cultural level is very high!',
+                knownCount: 'known',
+                categoryResult: 'Category-wise Culture Level Results',
+                total: 'Total',
+                resultTitle: 'Culture Level Assessment Results',
+                restart: 'Restart',
+                art: 'Artworks',
+                musical: 'Musicals',
+                play: 'Plays',
+                beginner: 'Beginner',
+                intermediate: 'Intermediate',
+                advanced: 'Advanced',
+                alertName: 'Please enter your name.',
+                alertNameLength: 'Korean names must be at least 2 characters.',
+                alertEmail: 'Please enter your email.',
+                alertEmailFormat: 'Please enter a valid email format.'
+            }
+        };
+
+        // 작품 데이터 (유명도: 1=매우 유명, 5=덜 유명)
         const ART_PIECES = [
-            { id: 'art_monalisa', title: '모나리자', creator: '레오나르도 다 빈치', year: '1503-1519' },
-            { id: 'art_starrynight', title: '별이 빛나는 밤', creator: '빈센트 반 고흐', year: '1889' },
-            { id: 'art_scream', title: '절규', creator: '에드바르 뭉크', year: '1893' },
-            { id: 'art_guernica', title: '게르니카', creator: '파블로 피카소', year: '1937' },
-            { id: 'art_soupcans', title: '캠벨 수프 캔', creator: '앤디 워홀', year: '1962' },
-            { id: 'art_greatwave', title: '가나가와의 거대한 파도', creator: '가쓰시카 호쿠사이', year: '1831' },
-            { id: 'art_memory', title: '기억의 지속', creator: '살바도르 달리', year: '1931' },
-            { id: 'art_kiss', title: '키스', creator: '구스타프 클림트', year: '1907-1908' },
-            { id: 'art_balloon', title: '소녀와 풍선', creator: '뱅크시', year: '2002' },
-            { id: 'art_infinity', title: '인피니티 미러룸', creator: '쿠사마 야요이', year: '1965' },
-            { id: 'art_beauty', title: '미인도', creator: '신윤복', year: '1805' },
-            { id: 'art_tvbuddha', title: 'TV 부처', creator: '백남준', year: '1974' },
-            { id: 'art_nighthawks', title: '밤의 매', creator: '에드워드 호퍼', year: '1942' },
-            { id: 'art_waterlilies', title: '수련', creator: '클로드 모네', year: '1919' },
-            { id: 'art_persistence', title: '지속되는 기억', creator: '살바도르 달리', year: '1931' },
+            { id: 'art_monalisa', title: '모나리자', titleEn: 'Mona Lisa', creator: '레오나르도 다 빈치', creatorEn: 'Leonardo da Vinci', year: '1503-1519', fame: 1 },
+            { id: 'art_starrynight', title: '별이 빛나는 밤', titleEn: 'The Starry Night', creator: '빈센트 반 고흐', creatorEn: 'Vincent van Gogh', year: '1889', fame: 1 },
+            { id: 'art_scream', title: '절규', titleEn: 'The Scream', creator: '에드바르 뭉크', creatorEn: 'Edvard Munch', year: '1893', fame: 1 },
+            { id: 'art_guernica', title: '게르니카', titleEn: 'Guernica', creator: '파블로 피카소', creatorEn: 'Pablo Picasso', year: '1937', fame: 1 },
+            { id: 'art_soupcans', title: '캠벨 수프 캔', titleEn: 'Campbell\'s Soup Cans', creator: '앤디 워홀', creatorEn: 'Andy Warhol', year: '1962', fame: 2 },
+            { id: 'art_greatwave', title: '가나가와의 거대한 파도', titleEn: 'The Great Wave off Kanagawa', creator: '가쓰시카 호쿠사이', creatorEn: 'Katsushika Hokusai', year: '1831', fame: 2 },
+            { id: 'art_waterlilies', title: '수련', titleEn: 'Water Lilies', creator: '클로드 모네', creatorEn: 'Claude Monet', year: '1919', fame: 2 },
+            { id: 'art_nighthawks', title: '밤의 매', titleEn: 'Nighthawks', creator: '에드워드 호퍼', creatorEn: 'Edward Hopper', year: '1942', fame: 3 },
+            { id: 'art_whistler', title: '화가의 어머니', titleEn: 'Arrangement in Grey and Black No.1', creator: '제임스 맥닐 휘슬러', creatorEn: 'James McNeill Whistler', year: '1871', fame: 4 },
         ];
 
         const MUSICALS = [
-            { id: 'mus_lesmis', title: '레 미제라블', creator: '클로드-미셸 숀버그', year: '1980' },
-            { id: 'mus_phantom', title: '오페라의 유령', creator: '앤드루 로이드 웨버', year: '1986' },
-            { id: 'mus_cats', title: '캣츠', creator: '앤드루 로이드 웨버', year: '1981' },
-            { id: 'mus_lionking', title: '라이온 킹', creator: '엘튼 존·팀 라이스', year: '1997' },
-            { id: 'mus_mammamia', title: '맘마 미아!', creator: 'ABBA 음악 기반', year: '1999' },
-            { id: 'mus_wicked', title: '위키드', creator: '스티븐 슈워츠', year: '2003' },
-            { id: 'mus_missaigon', title: '미스 사이공', creator: '숀버그·부벨', year: '1989' },
-            { id: 'mus_jekyll', title: '지킬 앤 하이드', creator: '프랭크 와일드혼', year: '1997' },
-            { id: 'mus_hamilton', title: '해밀턴', creator: '린-마누엘 미란다', year: '2015' },
-            { id: 'mus_werther', title: '베르테르', creator: '한국 창작', year: '2010' },
-            { id: 'mus_smileman', title: '웃는 남자', creator: '프랭크 와일드혼', year: '2012' },
-            { id: 'mus_redbook', title: '레드북', creator: '한국 창작', year: '2018' },
-            { id: 'mus_rent', title: '렌트', creator: '조나단 라슨', year: '1996' },
-            { id: 'mus_spring', title: '춘향전', creator: '한국 창작', year: '2015' },
-            { id: 'mus_elizabeth', title: '엘리자베스', creator: '실베스터 르베이', year: '1992' },
+            { id: 'mus_lesmis', title: '레 미제라블', titleEn: 'Les Misérables', creator: '클로드-미셸 숀버그', creatorEn: 'Claude-Michel Schönberg', year: '1980', fame: 1 },
+            { id: 'mus_phantom', title: '오페라의 유령', titleEn: 'The Phantom of the Opera', creator: '앤드루 로이드 웨버', creatorEn: 'Andrew Lloyd Webber', year: '1986', fame: 1 },
+            { id: 'mus_cats', title: '캣츠', titleEn: 'Cats', creator: '앤드루 로이드 웨버', creatorEn: 'Andrew Lloyd Webber', year: '1981', fame: 1 },
+            { id: 'mus_lionking', title: '라이온 킹', titleEn: 'The Lion King', creator: '엘튼 존·팀 라이스', creatorEn: 'Elton John & Tim Rice', year: '1997', fame: 1 },
+            { id: 'mus_mammamia', title: '맘마 미아!', titleEn: 'Mamma Mia!', creator: 'ABBA 음악 기반', creatorEn: 'Based on ABBA music', year: '1999', fame: 2 },
+            { id: 'mus_wicked', title: '위키드', titleEn: 'Wicked', creator: '스티븐 슈워츠', creatorEn: 'Stephen Schwartz', year: '2003', fame: 2 },
+            { id: 'mus_hamilton', title: '해밀턴', titleEn: 'Hamilton', creator: '린-마누엘 미란다', creatorEn: 'Lin-Manuel Miranda', year: '2015', fame: 2 },
+            { id: 'mus_rent', title: '렌트', titleEn: 'Rent', creator: '조나단 라슨', creatorEn: 'Jonathan Larson', year: '1996', fame: 3 },
+            { id: 'mus_chicago', title: '시카고', titleEn: 'Chicago', creator: '존 캔더·프레드 엡', creatorEn: 'John Kander & Fred Ebb', year: '1975', fame: 3 },
         ];
 
         const PLAYS = [
-            { id: 'play_hamlet', title: '햄릿', creator: '윌리엄 셰익스피어', year: '1603' },
-            { id: 'play_romeo', title: '로미오와 줄리엣', creator: '윌리엄 셰익스피어', year: '1597' },
-            { id: 'play_macbeth', title: '맥베스', creator: '윌리엄 셰익스피어', year: '1606' },
-            { id: 'play_antigone', title: '안티고네', creator: '소포클레스', year: 'BC 441' },
-            { id: 'play_oedipus', title: '오이디푸스 왕', creator: '소포클레스', year: 'BC 429' },
-            { id: 'play_streetcar', title: '욕망이라는 이름의 전차', creator: '테네시 윌리엄스', year: '1947' },
-            { id: 'play_salesman', title: '세일즈맨의 죽음', creator: '아서 밀러', year: '1949' },
-            { id: 'play_cherry', title: '벚꽃 동산', creator: '안톤 체호프', year: '1904' },
-            { id: 'play_godot', title: '고도를 기다리며', creator: '사무엘 베케트', year: '1953' },
-            { id: 'play_noexit', title: '출구 없는 방', creator: '장 폴 사르트르', year: '1944' },
-            { id: 'play_bald', title: '대머리 여가수', creator: '외젠 이오네스코', year: '1950' },
-            { id: 'play_guard', title: '파수꾼', creator: '이강백', year: '1968' },
-            { id: 'play_come', title: '날 보러와요', creator: '김광림 각색', year: '1990' },
-            { id: 'play_liar', title: '라이어', creator: '레이 쿠니', year: '1989' },
-            { id: 'play_glass', title: '유리 동물원', creator: '테네시 윌리엄스', year: '1944' },
-            { id: 'play_waiting', title: '고도를 기다리며', creator: '사무엘 베케트', year: '1953' },
-            { id: 'play_rhinoceros', title: '코뿔소', creator: '외젠 이오네스코', year: '1959' },
-            { id: 'play_king', title: '리어왕', creator: '윌리엄 셰익스피어', year: '1606' },
+            { id: 'play_hamlet', title: '햄릿', titleEn: 'Hamlet', creator: '윌리엄 셰익스피어', creatorEn: 'William Shakespeare', year: '1603', fame: 1 },
+            { id: 'play_romeo', title: '로미오와 줄리엣', titleEn: 'Romeo and Juliet', creator: '윌리엄 셰익스피어', creatorEn: 'William Shakespeare', year: '1597', fame: 1 },
+            { id: 'play_macbeth', title: '맥베스', titleEn: 'Macbeth', creator: '윌리엄 셰익스피어', creatorEn: 'William Shakespeare', year: '1606', fame: 1 },
+            { id: 'play_antigone', title: '안티고네', titleEn: 'Antigone', creator: '소포클레스', creatorEn: 'Sophocles', year: 'BC 441', fame: 2 },
+            { id: 'play_oedipus', title: '오이디푸스 왕', titleEn: 'Oedipus Rex', creator: '소포클레스', creatorEn: 'Sophocles', year: 'BC 429', fame: 2 },
+            { id: 'play_streetcar', title: '욕망이라는 이름의 전차', titleEn: 'A Streetcar Named Desire', creator: '테네시 윌리엄스', creatorEn: 'Tennessee Williams', year: '1947', fame: 2 },
+            { id: 'play_salesman', title: '세일즈맨의 죽음', titleEn: 'Death of a Salesman', creator: '아서 밀러', creatorEn: 'Arthur Miller', year: '1949', fame: 2 },
+            { id: 'play_cherry', title: '벚꽃 동산', titleEn: 'The Cherry Orchard', creator: '안톤 체호프', creatorEn: 'Anton Chekhov', year: '1904', fame: 3 },
+            { id: 'play_godot', title: '고도를 기다리며', titleEn: 'Waiting for Godot', creator: '사무엘 베케트', creatorEn: 'Samuel Beckett', year: '1953', fame: 3 },
+            { id: 'play_doll', title: '인형의 집', titleEn: 'A Doll\'s House', creator: '헨리크 입센', creatorEn: 'Henrik Ibsen', year: '1879', fame: 3 },
+            { id: 'play_king', title: '리어왕', titleEn: 'King Lear', creator: '윌리엄 셰익스피어', creatorEn: 'William Shakespeare', year: '1606', fame: 2 },
         ];
 
         const CATEGORIES = [
-            { key: 'art', label: '예술 작품', items: ART_PIECES },
-            { key: 'musical', label: '뮤지컬', items: MUSICALS },
-            { key: 'play', label: '연극', items: PLAYS },
+            { key: 'art', label: '예술 작품', labelEn: 'Artworks', items: ART_PIECES },
+            { key: 'musical', label: '뮤지컬', labelEn: 'Musicals', items: MUSICALS },
+            { key: 'play', label: '연극', labelEn: 'Plays', items: PLAYS },
         ];
 
         // 상태
@@ -319,8 +513,45 @@
         let userEmail = '';
         let currentStep = 0;
         let currentArtworkIndex = 0;
-        const selectedItems = {};
+        const selectedItems = {}; // { id: 'know' | 'seen' | 'dontKnow' }
         const totalItems = CATEGORIES.reduce((sum, cat) => sum + cat.items.length, 0);
+
+        // 언어 전환
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'ko' ? 'en' : 'ko';
+            updateLanguage();
+        }
+
+        // 언어 업데이트
+        function updateLanguage() {
+            const t = translations[currentLanguage];
+            document.getElementById('language-toggle').textContent = currentLanguage === 'ko' ? 'English' : '한국어';
+            
+            // 입력 화면
+            if (document.getElementById('input-screen').style.display !== 'none') {
+                document.querySelector('.input-title').textContent = t.title;
+                document.querySelector('label[for="user-name"]').textContent = t.name;
+                document.querySelector('label[for="user-email"]').textContent = t.email;
+                document.getElementById('user-name').placeholder = t.namePlaceholder;
+                document.getElementById('user-email').placeholder = t.emailPlaceholder;
+                document.querySelector('.privacy-notice').textContent = t.privacy;
+                document.querySelector('#input-screen button').textContent = t.start;
+            }
+            
+            // 메인 화면
+            if (document.getElementById('main-screen').style.display !== 'none') {
+                document.getElementById('know-btn').textContent = t.know;
+                document.getElementById('seen-btn').textContent = t.seen;
+                document.getElementById('dont-know-btn').textContent = t.dontKnow;
+                updateScreen();
+            }
+            
+            // 결과 화면
+            if (document.getElementById('result-screen').style.display !== 'none') {
+                document.querySelector('#result-screen button').textContent = t.restart;
+                showResult();
+            }
+        }
 
         // 엔터 키 처리
         function handleInputEnter(event) {
@@ -337,8 +568,10 @@
             userName = nameInput.value.trim();
             userEmail = emailInput.value.trim();
 
+            const t = translations[currentLanguage];
+            
             if (!userName) {
-                alert('이름을 입력해주세요.');
+                alert(t.alertName);
                 nameInput.focus();
                 return;
             }
@@ -346,13 +579,13 @@
             // 한글 이름이 1글자인 경우 검증
             const koreanRegex = /^[가-힣]+$/;
             if (koreanRegex.test(userName) && userName.length === 1) {
-                alert('한글 이름은 2글자 이상 입력해주세요.');
+                alert(t.alertNameLength);
                 nameInput.focus();
                 return;
             }
 
             if (!userEmail) {
-                alert('이메일을 입력해주세요.');
+                alert(t.alertEmail);
                 emailInput.focus();
                 return;
             }
@@ -360,13 +593,15 @@
             // 이메일 형식 검증
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(userEmail)) {
-                alert('올바른 이메일 형식을 입력해주세요.');
+                alert(t.alertEmailFormat);
                 emailInput.focus();
                 return;
             }
 
             document.getElementById('input-screen').style.display = 'none';
             document.getElementById('main-screen').style.display = 'block';
+            // 입력 화면에서는 진행률 0%
+            document.getElementById('top-progress-fill').style.width = '0%';
             updateScreen();
         }
 
@@ -385,15 +620,21 @@
         function updateScreen() {
             const artwork = getCurrentArtwork();
             const category = CATEGORIES[currentStep];
+            const progress = getProgress();
+            const t = translations[currentLanguage];
 
             // 진행 표시
+            const categoryLabel = currentLanguage === 'ko' ? category.label : category.labelEn;
             document.getElementById('progress-text').textContent = 
-                `${category.label} (${currentArtworkIndex + 1}/${category.items.length})`;
-            document.getElementById('progress-fill').style.width = `${getProgress()}%`;
+                `${categoryLabel} (${currentArtworkIndex + 1}/${category.items.length})`;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+            
+            // 상단 진행률 바 업데이트
+            document.getElementById('top-progress-fill').style.width = `${progress}%`;
 
             // 작품 정보
-            document.getElementById('artwork-title').textContent = artwork.title;
-            document.getElementById('artwork-creator').textContent = artwork.creator;
+            document.getElementById('artwork-title').textContent = currentLanguage === 'ko' ? artwork.title : artwork.titleEn;
+            document.getElementById('artwork-creator').textContent = currentLanguage === 'ko' ? artwork.creator : artwork.creatorEn;
             document.getElementById('artwork-year').textContent = artwork.year || '';
         }
 
@@ -418,51 +659,147 @@
         // 안다 버튼
         function handleKnow() {
             const artwork = getCurrentArtwork();
-            selectedItems[artwork.id] = true;
+            selectedItems[artwork.id] = 'know';
+            goToNext();
+        }
+
+        // 본 적이 있다 버튼
+        function handleSeen() {
+            const artwork = getCurrentArtwork();
+            selectedItems[artwork.id] = 'seen';
             goToNext();
         }
 
         // 모른다 버튼
         function handleDontKnow() {
             const artwork = getCurrentArtwork();
-            selectedItems[artwork.id] = false;
+            selectedItems[artwork.id] = 'dontKnow';
             goToNext();
         }
 
-        // 결과 계산
+        // 가중치 계산 (유명도가 높을수록 가중치 낮음)
+        function getWeight(fame) {
+            // fame: 1(매우 유명) -> 가중치 0.5, 2 -> 0.75, 3 -> 1.0, 4 -> 1.5, 5(덜 유명) -> 2.0
+            return 0.5 + (fame - 1) * 0.25;
+        }
+
+        // 작품별 점수 계산
+        function getItemScore(item, status) {
+            if (status === 'dontKnow') return 0;
+            const baseScore = status === 'seen' ? 1.5 : 1.0; // 본 적이 있으면 더 높은 점수
+            return baseScore * getWeight(item.fame);
+        }
+
+        // 분야별 수준 판정 (가중치 점수 기반)
+        function getCategoryLevel(weightedScore, maxScore) {
+            const ratio = weightedScore / maxScore;
+            const t = translations[currentLanguage];
+            if (ratio >= 0.7) {
+                return { level: t.advanced, levelClass: 'level-advanced' };
+            } else if (ratio >= 0.4) {
+                return { level: t.intermediate, levelClass: 'level-intermediate' };
+            } else {
+                return { level: t.beginner, levelClass: 'level-beginner' };
+            }
+        }
+
+        // 전반적 수준 판정 (가중치 점수 기반)
+        function getOverallLevel(weightedScore, maxScore) {
+            const ratio = weightedScore / maxScore;
+            const t = translations[currentLanguage];
+            if (ratio >= 0.7) {
+                return { 
+                    level: t.overallAdvanced, 
+                    levelClass: 'level-advanced',
+                    description: t.overallDescAdvanced
+                };
+            } else if (ratio >= 0.4) {
+                return { 
+                    level: t.overallIntermediate, 
+                    levelClass: 'level-intermediate',
+                    description: t.overallDescIntermediate
+                };
+            } else {
+                return { 
+                    level: t.overallBeginner, 
+                    levelClass: 'level-beginner',
+                    description: t.overallDescBeginner
+                };
+            }
+        }
+
+        // 결과 계산 (가중치 적용)
         function calculateResults() {
             const categoryResults = {};
+            let totalWeightedScore = 0;
+            let totalMaxScore = 0;
             let totalKnown = 0;
+            let totalSeen = 0;
             const detailedResults = [];
+            const t = translations[currentLanguage];
 
             CATEGORIES.forEach(category => {
-                const known = category.items.filter(item => selectedItems[item.id]).length;
-                const total = category.items.length;
-                categoryResults[category.key] = { known, total };
-                totalKnown += known;
+                let categoryWeightedScore = 0;
+                let categoryMaxScore = 0;
+                let categoryKnown = 0;
+                let categorySeen = 0;
 
-                // 상세 결과 수집
                 category.items.forEach(item => {
+                    const status = selectedItems[item.id];
+                    const maxScore = getItemScore(item, 'know'); // 최대 점수 (안다 기준)
+                    categoryMaxScore += maxScore;
+                    
+                    if (status === 'know' || status === 'seen') {
+                        categoryKnown++;
+                        if (status === 'seen') categorySeen++;
+                    }
+                    
+                    const score = getItemScore(item, status);
+                    categoryWeightedScore += score;
+                    
+                    // 상세 결과 수집
+                    let statusText = '';
+                    if (status === 'know') statusText = t.know;
+                    else if (status === 'seen') statusText = t.seen;
+                    else statusText = t.dontKnow;
+                    
                     detailedResults.push({
-                        category: category.label,
-                        title: item.title,
-                        creator: item.creator,
+                        category: currentLanguage === 'ko' ? category.label : category.labelEn,
+                        title: currentLanguage === 'ko' ? item.title : item.titleEn,
+                        creator: currentLanguage === 'ko' ? item.creator : item.creatorEn,
                         year: item.year || '',
-                        known: selectedItems[item.id] ? '안다' : '모른다'
+                        status: statusText,
+                        score: score.toFixed(2),
+                        maxScore: maxScore.toFixed(2)
                     });
                 });
+
+                totalWeightedScore += categoryWeightedScore;
+                totalMaxScore += categoryMaxScore;
+                totalKnown += categoryKnown;
+                totalSeen += categorySeen;
+
+                const levelInfo = getCategoryLevel(categoryWeightedScore, categoryMaxScore);
+                categoryResults[category.key] = { 
+                    known: categoryKnown,
+                    seen: categorySeen,
+                    total: category.items.length,
+                    weightedScore: categoryWeightedScore,
+                    maxScore: categoryMaxScore,
+                    level: levelInfo.level,
+                    levelClass: levelInfo.levelClass
+                };
             });
 
-            // 수준 판정
-            const ratio = totalKnown / totalItems;
-            let level = '초급자';
-            if (ratio >= 0.7) {
-                level = '고급자';
-            } else if (ratio >= 0.4) {
-                level = '중급자';
-            }
-
-            return { level, totalKnown, totalItems, categoryResults, detailedResults };
+            return { 
+                totalKnown, 
+                totalSeen,
+                totalItems, 
+                totalWeightedScore,
+                totalMaxScore,
+                categoryResults, 
+                detailedResults 
+            };
         }
 
         // 전역 결과 변수
@@ -471,26 +808,53 @@
         // 결과 화면 표시
         function showResult() {
             currentResults = calculateResults();
+            const t = translations[currentLanguage];
 
             document.getElementById('main-screen').style.display = 'none';
             document.getElementById('result-screen').style.display = 'block';
+            // 결과 화면에서는 진행률 100%
+            document.getElementById('top-progress-fill').style.width = '100%';
 
-            document.getElementById('result-level').textContent = currentResults.level;
+            // 전반적 평가 계산 (가중치 점수 기반)
+            const overallLevel = getOverallLevel(currentResults.totalWeightedScore, currentResults.totalMaxScore);
+            
+            // 전체 평가 섹션 표시
+            const overallHtml = `
+                <div class="overall-assessment">
+                    <div class="overall-title">${t.overallTitle}</div>
+                    <div class="overall-level">${overallLevel.level}</div>
+                    <div class="overall-description">${overallLevel.description}</div>
+                    <div>
+                        <span class="overall-badge ${overallLevel.levelClass}">
+                            ${currentResults.totalKnown} / ${currentResults.totalItems} ${t.knownCount}
+                        </span>
+                    </div>
+                </div>
+            `;
+
+            // 결과 제목과 점수 업데이트
+            document.getElementById('result-level').textContent = t.categoryResult;
             document.getElementById('result-score').textContent = 
-                `${currentResults.totalKnown} / ${currentResults.totalItems}`;
+                `${t.total}: ${currentResults.totalKnown} / ${currentResults.totalItems}`;
 
             const categoriesDiv = document.getElementById('result-categories');
-            categoriesDiv.innerHTML = '';
+            categoriesDiv.innerHTML = overallHtml;
 
+            // 분야별 결과 추가
             Object.entries(currentResults.categoryResults).forEach(([category, stats]) => {
-                const categoryName = category === 'art' ? '예술 작품' : 
-                                    category === 'musical' ? '뮤지컬' : '연극';
+                const categoryName = category === 'art' ? t.art : 
+                                    category === 'musical' ? t.musical : t.play;
                 
                 const div = document.createElement('div');
                 div.className = 'category-item';
                 div.innerHTML = `
-                    <span class="category-name">${categoryName}</span>
-                    <span class="category-score">${stats.known}/${stats.total}</span>
+                    <div style="flex: 1;">
+                        <div class="category-name">${categoryName}</div>
+                        <div class="category-level">${stats.known}/${stats.total} ${t.knownCount}</div>
+                    </div>
+                    <div>
+                        <span class="category-level-badge ${stats.levelClass}">${stats.level}</span>
+                    </div>
                 `;
                 categoriesDiv.appendChild(div);
             });
@@ -508,16 +872,22 @@
         function downloadJSON() {
             if (!currentResults) return;
 
+            const overallLevel = getOverallLevel(currentResults.totalWeightedScore, currentResults.totalMaxScore);
             const jsonData = {
                 user: {
                     name: userName,
                     email: userEmail
                 },
                 timestamp: new Date().toISOString(),
-                level: currentResults.level,
+                language: currentLanguage,
+                overallLevel: overallLevel.level,
                 totalKnown: currentResults.totalKnown,
+                totalSeen: currentResults.totalSeen,
                 totalItems: currentResults.totalItems,
-                ratio: Math.round((currentResults.totalKnown / currentResults.totalItems) * 100),
+                totalWeightedScore: currentResults.totalWeightedScore.toFixed(2),
+                totalMaxScore: currentResults.totalMaxScore.toFixed(2),
+                weightedRatio: Math.round((currentResults.totalWeightedScore / currentResults.totalMaxScore) * 100),
+                simpleRatio: Math.round((currentResults.totalKnown / currentResults.totalItems) * 100),
                 categoryResults: currentResults.categoryResults,
                 detailedResults: currentResults.detailedResults
             };
@@ -544,12 +914,21 @@
             document.getElementById('main-screen').style.display = 'none';
             document.getElementById('result-screen').style.display = 'none';
             
+            // 진행률 바 초기화
+            document.getElementById('top-progress-fill').style.width = '0%';
+            
             // 입력 필드 초기화
             document.getElementById('user-name').value = '';
             document.getElementById('user-email').value = '';
             userName = '';
             userEmail = '';
+            
+            // 언어 업데이트
+            updateLanguage();
         }
+
+        // 초기 언어 설정
+        updateLanguage();
     </script>
 </body>
 </html>
