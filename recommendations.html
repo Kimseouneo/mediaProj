@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>추천 작품 보기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 10px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            z-index: 1000;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 1.2em;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 0.75em;
+            margin: 2px 0 0 0;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            z-index: 1001;
+        }
+
+        .back-button:hover {
+            background: #45a049;
+        }
+
+        .iframe-container {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: calc(100vh - 60px);
+            overflow: hidden;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* iframe 내부의 중복 제목 숨기기 */
+        iframe[src*="analysis_result.html"] {
+            /* iframe 내부 스타일은 직접 접근 불가하므로, 
+               analysis_result.html의 제목을 숨기려면 해당 파일을 수정해야 함 */
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                height: 70px;
+                padding: 8px 15px;
+            }
+
+            .header h1 {
+                font-size: 1em;
+            }
+
+            .header p {
+                font-size: 0.7em;
+            }
+
+            .back-button {
+                top: 5px;
+                left: 5px;
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .iframe-container {
+                top: 70px;
+                height: calc(100vh - 70px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">← 돌아가기</a>
+    
+    <div class="header">
+        <h1>📚 입문자 추천 작품</h1>
+        <p>리뷰 분석을 기반으로 한 작품 추천 결과입니다</p>
+    </div>
+
+    <div class="iframe-container">
+        <div class="loading" id="loading">로딩 중...</div>
+        <iframe 
+            id="recommendations-iframe" 
+            src="analysis_result.html" 
+            onload="document.getElementById('loading').style.display='none'"
+            title="추천 작품 분석 결과">
+        </iframe>
+    </div>
+
+    <script>
+        // iframe 로드 실패 시 처리
+        window.addEventListener('error', function(e) {
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.textContent = 'analysis_result.html 파일을 찾을 수 없습니다.';
+                loading.style.color = '#f44336';
+            }
+        });
+
+        // iframe 로드 확인 및 높이 조정
+        const iframe = document.getElementById('recommendations-iframe');
+        iframe.addEventListener('load', function() {
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.style.display = 'none';
+            }
+            
+            // iframe 내부 스크롤 활성화 및 제목 숨기기
+            try {
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                if (iframeDoc.body) {
+                    iframeDoc.body.style.overflowY = 'auto';
+                    // 중복 제목 숨기기
+                    const title = iframeDoc.querySelector('h1');
+                    if (title && title.textContent.includes('작품 사용자 적합성 분석 결과')) {
+                        title.style.display = 'none';
+                    }
+                }
+            } catch (e) {
+                // Cross-origin 문제로 접근 불가 시 무시
+                console.log('iframe 내부 접근 불가 (정상 동작)');
+            }
+        });
+
+        // 윈도우 리사이즈 시 높이 재조정
+        function adjustHeight() {
+            const header = document.querySelector('.header');
+            const headerHeight = header ? header.offsetHeight : 60;
+            const container = document.querySelector('.iframe-container');
+            if (container) {
+                container.style.top = headerHeight + 'px';
+                container.style.height = `calc(100vh - ${headerHeight}px)`;
+            }
+        }
+
+        window.addEventListener('resize', adjustHeight);
+        
+        // 초기 높이 설정
+        setTimeout(adjustHeight, 100);
+    </script>
+</body>
+</html>
+
