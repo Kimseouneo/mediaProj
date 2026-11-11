@@ -1,192 +1,82 @@
-(function () {
-  const STORAGE_KEY = 'interparkReviews';
+// console에서 allow pasting 입력 후 진행
+(async function () {
+  // NOL(야놀자) 티켓 리뷰 수집기 — nol.yanolja.com/ticket/products/...
+  // 사용법: 콘솔에 'allow pasting' 입력 후 붙여넣기 → Enter
+  const STORAGE_KEY = 'nolReviews';
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const DATE_RE = /\d{4}\.\d{2}\.\d{2}/;
 
-  const items = document.querySelectorAll('li.bbsItem');
-  const collected = [];
+  // 1) 리뷰 전체보기 창 열기 (이미 열려 있으면 건너뜀)
+  const findBox = () =>
+    [...document.querySelectorAll('*')].find(e =>
+      /(auto|scroll)/.test(getComputedStyle(e).overflowY) &&
+      e.scrollHeight > e.clientHeight + 50 &&
+      e.querySelector('li p'));
 
-  items.forEach((li, idx) => {
-    // 1) 리뷰 텍스트
-    const textEl = li.querySelector('p.bbsText');
-    let text = textEl ? textEl.innerText : '';
-    text = text.replace(/\s+/g, ' ').trim();
-    if (!text) return; // 내용 없는 건 스킵
-
-    // 2) 평점
-    const rating = getRating(li);
-
-    // 3) 공감 수 (수정된 부분)
-    const empathy = getEmpathy(li);
-
-    // 디버깅: 공감 수를 못 찾은 경우 콘솔에 출력
-    if (!empathy) {
-      console.warn(`[리뷰 ${idx + 1}] 공감 수를 찾지 못했습니다. HTML 구조:`, li.innerHTML.substring(0, 200));
+  let box = findBox();
+  if (!box) {
+    const openBtn = [...document.querySelectorAll('button, a')]
+      .find(b => /리뷰\s*\d+개\s*전체보기/.test(b.innerText || ''));
+    if (!openBtn) {
+      console.warn('"리뷰 N개 전체보기" 버튼을 찾지 못했습니다. 리뷰 탭까지 스크롤한 뒤 다시 실행하세요.');
+      return;
     }
+    openBtn.click();
+    await sleep(2000);
+    box = findBox();
+  }
+  if (!box) {
+    console.warn('리뷰 스크롤 영역을 찾지 못했습니다.');
+    return;
+  }
 
-    collected.push({ text, rating, empathy });
+  const getItems = () =>
+    [...box.querySelectorAll('li')].filter(li =>
+      li.querySelector('p') && DATE_RE.test(li.innerText || ''));
+
+  // 2) 끝까지 스크롤해서 전부 로드 (무한 스크롤)
+  let last = -1, same = 0;
+  for (let i = 0; i < 100 && same < 3; i++) {
+    box.scrollTop = box.scrollHeight;
+    await sleep(1000);
+    const n = getItems().length;
+    same = n === last ? same + 1 : 0;
+    last = n;
+  }
+
+  // 3) "...더보기" 전부 펼치기
+  box.querySelectorAll('p button').forEach(b => {
+    if (/더보기/.test(b.innerText)) b.click();
   });
+  await sleep(800);
 
-  // === 평점 추출 함수 (기존과 동일) ===
-  function getRating(root) {
-    // (1) data-star
-    const starEl = root.querySelector('[data-star]');
-    if (starEl) {
-      const val = starEl.getAttribute('data-star') || starEl.dataset && starEl.dataset.star;
-      if (val) return String(val);
-    }
+  // 4) 수집
+  const collected = getItems().map(li => {
+    const p = li.querySelector('p').cloneNode(true);
+    p.querySelectorAll('button').forEach(b => b.remove());
+    const text = p.innerText.replace(/\s+/g, ' ').trim();
+    const name = ((li.querySelector('span') || {}).innerText || '').trim();
+    const date = (li.innerText.match(DATE_RE) || [''])[0];
 
-    // (2) aria-label="평점 5점" 등
-    const ariaEl = root.querySelector('[aria-label*="점"]');
-    if (ariaEl) {
-      const label = ariaEl.getAttribute('aria-label') || ariaEl.innerText;
-      const m = label && label.match(/([0-9]+(?:\.[0-9]+)?)/);
-      if (m) return m[1];
-    }
+    // 좋아요 버튼: 0이면 "좋아요" 글자, 1 이상이면 숫자가 표시됨
+    const likeBtn = [...li.querySelectorAll('button')]
+      .find(b => b.querySelector('span') && /^(좋아요|\d+)$/.test(b.innerText.trim()));
+    const lt = likeBtn ? likeBtn.innerText.trim() : '';
+    const empathy = /^\d+$/.test(lt) ? lt : '0';
 
-    // (3) ★ 개수
-    const starTextRoot = root.querySelector('.bbsStar, .bbsStarArea, .star, .rating');
-    if (starTextRoot) {
-      const starText = starTextRoot.textContent || '';
-      const stars = (starText.match(/★/g) || []).length;
-      if (stars > 0) return String(stars);
-    }
+    return { name, text, rating: '', empathy, date };
+  }).filter(r => r.text);
 
-    return '';
-  }
-
-  // === 공감 수 추출 함수 (Interpark용 강화 버전) ===
-  function getEmpathy(root) {
-    // 1) 다양한 선택자로 공감 버튼/요소 찾기
-    const likeSelectors = [
-      '.bbsLikeBtn',
-      '.bbsItemInfo .bbsLikeBtn',
-      '.bbsItemInfoList .bbsLikeBtn',
-      'a[class*="Like"]',
-      'button[class*="Like"]',
-      '.likeBtn',
-      '[class*="공감"]',
-      'a[title*="공감"]',
-      'button[title*="공감"]'
-    ];
-
-    for (const selector of likeSelectors) {
-      const likeBtn = root.querySelector(selector);
-      if (!likeBtn) continue;
-
-      // data 속성들 확인
-      const dataAttrs = [
-        likeBtn.getAttribute('data-cnt'),
-        likeBtn.getAttribute('data-count'),
-        likeBtn.getAttribute('data-like'),
-        likeBtn.getAttribute('data-empathy'),
-        likeBtn.dataset?.cnt,
-        likeBtn.dataset?.count,
-        likeBtn.dataset?.like,
-        likeBtn.dataset?.empathy
-      ];
-
-      for (let val of dataAttrs) {
-        if (val && String(val).match(/^[0-9]+$/)) {
-          return String(val);
-        }
-      }
-
-      // title, aria-label 확인
-      const title = likeBtn.getAttribute('title') || likeBtn.getAttribute('aria-label') || '';
-      if (title) {
-        const m = title.match(/공감\s*([0-9]+)|([0-9]+)\s*공감|([0-9]+)/);
-        if (m) return m[1] || m[2] || m[3];
-      }
-
-      // textContent 확인
-      const text = likeBtn.textContent || likeBtn.innerText || '';
-      const numMatch = text.match(/([0-9]+)/);
-      if (numMatch) return numMatch[1];
-    }
-
-    // 2) 공감 버튼 옆의 숫자 요소 찾기 (span, em, strong 등)
-    const likeBtn = root.querySelector('.bbsLikeBtn, [class*="Like"], [class*="공감"]');
-    if (likeBtn) {
-      // 형제 요소에서 숫자 찾기
-      let sibling = likeBtn.nextElementSibling;
-      while (sibling && sibling !== root) {
-        const text = sibling.textContent || '';
-        const m = text.match(/([0-9]+)/);
-        if (m) return m[1];
-        sibling = sibling.nextElementSibling;
-      }
-
-      // 부모 요소 내에서 숫자 찾기
-      const parent = likeBtn.parentElement;
-      if (parent) {
-        const allText = parent.textContent || '';
-        const m = allText.match(/공감\s*([0-9]+)|([0-9]+)\s*공감/);
-        if (m) return m[1] || m[2];
-      }
-    }
-
-    // 3) li.bbsItemInfoList 전체에서 "공감 숫자" 패턴 찾기
-    const infoLis = root.querySelectorAll('li.bbsItemInfoList, .bbsItemInfo li');
-    for (const li of infoLis) {
-      const text = li.textContent || li.innerText || '';
-      if (text.includes('공감')) {
-        const m = text.match(/공감\s*([0-9]+)|([0-9]+)\s*공감/);
-        if (m) return m[1] || m[2];
-      }
-
-      // ::before content 확인
-      try {
-        const style = window.getComputedStyle(li, '::before');
-        let content = style?.getPropertyValue('content') || '';
-        if (content && content !== 'none' && content !== '""') {
-          content = content.replace(/^['"](.*)['"]$/, '$1').trim();
-          if (content.includes('공감')) {
-            const m = content.match(/공감\s*([0-9]+)|([0-9]+)\s*공감/);
-            if (m) return m[1] || m[2];
-          }
-        }
-      } catch (e) {
-        // ::before 접근 실패 시 무시
-      }
-    }
-
-    // 4) 전체 리뷰 항목에서 "공감" 키워드와 숫자 함께 있는 부분 찾기
-    const allText = root.textContent || root.innerText || '';
-    const empathyMatch = allText.match(/공감\s*([0-9]+)|([0-9]+)\s*공감/);
-    if (empathyMatch) {
-      return empathyMatch[1] || empathyMatch[2];
-    }
-
-    // 5) 마지막 시도: 숫자만 있는 요소 중 공감 버튼 근처의 것
-    const numbers = root.querySelectorAll('span, em, strong, b');
-    for (const numEl of numbers) {
-      const text = numEl.textContent || '';
-      if (text.match(/^[0-9]+$/)) {
-        const parent = numEl.parentElement;
-        if (parent && (parent.textContent || '').includes('공감')) {
-          return text;
-        }
-      }
-    }
-
-    // 못 찾으면 빈 문자열 반환
-    return '';
-  }
-
-  // === localStorage에 누적 저장 + 중복 제거 ===
-  const prevRaw = localStorage.getItem(STORAGE_KEY);
-  let all = prevRaw ? JSON.parse(prevRaw) : [];
-
-  const prevSet = new Set(all.map(r => `${r.text}|||${r.rating}|||${r.empathy}`));
-
+  // 5) localStorage 누적 저장 + 중복 제거
+  let all = [];
+  try { all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch (e) { all = []; }
+  const keyOf = r => `${r.name}|||${r.date}|||${r.text}`;
+  const seen = new Set(all.map(keyOf));
   collected.forEach(r => {
-    const key = `${r.text}|||${r.rating}|||${r.empathy}`;
-    if (!prevSet.has(key)) {
-      prevSet.add(key);
-      all.push(r);
-    }
+    const k = keyOf(r);
+    if (!seen.has(k)) { seen.add(k); all.push(r); }
   });
-
   localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
 
-  console.log(`이번 페이지에서 ${collected.length}개 수집, 총 ${all.length}개가 localStorage에 저장되었습니다.`);
+  console.log(`이번 페이지에서 ${collected.length}개 수집, 총 ${all.length}개가 localStorage(${STORAGE_KEY})에 저장되었습니다.`);
 })();
